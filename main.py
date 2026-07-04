@@ -24,9 +24,7 @@ class ProjectManager:
         self.projects_dir.mkdir(parents=True, exist_ok=True)
         self.load_template()
 
-    # ------------------------------------------------------------------
     # Menu / control flow
-    # ------------------------------------------------------------------
     def run(self):
         print("Welcome to Just Manage My Projects!")
         print("What would you like to do?")
@@ -69,9 +67,7 @@ class ProjectManager:
 
         return True
 
-    # ------------------------------------------------------------------
     # Template handling
-    # ------------------------------------------------------------------
     def reload_template(self):
         if not self.template_path.exists():
             self._create_default_template()
@@ -109,9 +105,7 @@ class ProjectManager:
         print(f"init-git-repo: {self.template['init-git-repo']}")
         print()
 
-    # ------------------------------------------------------------------
     # Project actions
-    # ------------------------------------------------------------------
     def _is_valid_project_name(self, name: str) -> bool:
         if not name or not name.strip():
             return False
@@ -178,7 +172,9 @@ class ProjectManager:
                 text=True,
             )
             if result.returncode != 0:
-                print(f"Warning: failed to {description}. Git said:\n{result.stderr.strip()}\n")
+                print(
+                    f"Warning: failed to {description}. Git said:\n{result.stderr.strip()}\n"
+                )
                 return
 
     def list_existing_projects(self):
@@ -209,4 +205,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
