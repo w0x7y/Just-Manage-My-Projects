@@ -136,11 +136,10 @@ python main.py
 ## Future Enhancements 🚀
 
 - [ ] Update project functionality
-- [ ] Delete project functionality
-- [ ] Project metadata (description, tags, status)
+- [x] Delete project functionality
+- [x] Project metadata
 - [ ] Task management within projects
 - [ ] Project statistics and analytics
-- [ ] Configuration options for customizing project structure
 - [ ] Web-based interface
 - [ ] Export project information
 
