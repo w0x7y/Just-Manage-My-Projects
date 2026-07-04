@@ -135,10 +135,10 @@ python main.py
 
 ## Future 🚀
 
-- [ ] Update project functionality
-- [x] Task management within projects
+- [ ] Auto getting the project information from GitHub (if a GitHub repository is associated with the project)
+- [ ] Fixing the TODO list fetching from the file to the Web-based interface
 - [x] Web-based interface
-- [ ] Auto GitHub integration for project updates (fetching newer versions, issuse and more)
+- [ ] Auto GitHub integration for project updates (fetching newer versions, issues and more)
 - [ ] Export project information
 
 ## License 📄
