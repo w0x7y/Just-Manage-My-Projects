@@ -133,7 +133,7 @@ source .venv/bin/activate
 python main.py
 ```
 
-## Future Enhancements 🚀
+## Future 🚀
 
 - [ ] Update project functionality
 - [x] Delete project functionality
