@@ -194,9 +194,22 @@ class ProjectManager:
         print("Update project is not implemented yet — coming soon!\n")
 
     def delete_project(self):
-        # TODO: implement project deletion
-        print("Delete project is not implemented yet — coming soon!\n")
+        project_name = input("Enter the name of the project to delete: ")
+        project_path = self.projects_dir / project_name
 
+        if not project_path.exists() or not project_path.is_dir():
+            print(f"No project named '{project_name}' found.\n")
+            return
+
+        confirmation = input(
+            f"Are you sure you want to delete the project '{project_name}'? (y/n): "
+        ).strip().lower()
+
+        if confirmation == "y":
+            shutil.rmtree(project_path)
+            print(f"Project '{project_name}' has been deleted.\n")
+        else:
+            print("Deletion canceled.\n")
 
 def main():
     manager = ProjectManager()
