@@ -136,11 +136,9 @@ python main.py
 ## Future 🚀
 
 - [ ] Update project functionality
-- [x] Delete project functionality
-- [x] Project metadata
-- [ ] Task management within projects
-- [ ] Project statistics and analytics
-- [ ] Web-based interface
+- [x] Task management within projects
+- [x] Web-based interface
+- [ ] Auto GitHub integration for project updates (fetching newer versions, issuse and more)
 - [ ] Export project information
 
 ## License 📄
