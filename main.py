@@ -6,9 +6,65 @@ from pathlib import Path
 # Characters that are invalid in folder names on Windows/macOS/Linux
 INVALID_NAME_CHARS = set('<>:"/\\|?*')
 
+DEFAULT_TODO_TEMPLATE = """# TODO
+
+## High Priority
+- [x] (This is a template)
+- [ ] (This is a template)
+
+## Medium Priority
+- [x] (This is a template)
+- [ ] (This is a template)
+
+## Low Priority
+- [x] (This is a template)
+- [ ] (This is a template)
+"""
+
+DEFAULT_ISSUES_TRACKER = {
+    "issues": [
+        {
+            "id": 0,
+            "title": "This is a template issue",
+            "status": "open/closed",
+            "priority": "high/medium/low",
+            "created": "YYYY-MM-DD",
+            "labels": ["bug/feature/enhancement"],
+            "assignee": "username/undifined",
+            "description": "This is a template issue description. You can provide more details about the issue here, including steps to reproduce, expected behavior, and any relevant screenshots or logs.",
+        }
+    ]
+}
+
+DEFAULT_PROJECT_METADATA = {
+    "project": {
+        "name": " ",
+        "description": " ",
+        "language": " ",
+        "version": " ",
+        "license": " ",
+        "author": " ",
+        "created": "YYYY-MM-DD",
+    },
+    "dependencies": [{"name": " ", "version": " "}, {"name": " ", "version": " "}],
+}
+
+DEFAULT_FILE_CONTENTS = {
+    "TODO.md": DEFAULT_TODO_TEMPLATE,
+    "Issues.json": json.dumps(DEFAULT_ISSUES_TRACKER, indent=2),
+    "Project.json": json.dumps(DEFAULT_PROJECT_METADATA, indent=2),
+}
+
 DEFAULT_TEMPLATE = {
+    "folders": {
+        "src": True,  # src is a folder for source code
+    },
     "files": {
-        "README.md": True,
+        "Notes.md": False,  # Notes.md is a file for taking free-form notes
+        "Project.json": True,  # Project.json is a file for storing project metadata
+        "Issues.json": True,  # Issues.json is a file for tracking issues
+        "TODO.md": True,  # TODO.md is a file for tracking tasks
+        "README.md": True,  # README.md is a file for project documentation
         ".gitignore": False,
     },
     "init-git-repo": False,
@@ -39,7 +95,7 @@ class ProjectManager:
             "    0. Reload project template\n"
             "    1. Create a new project\n"
             "    2. List existing projects\n"
-            "    3. Update a project\n"
+            "    3. Update a project (If a remote Git repo is present)\n"
             "    4. Delete a project\n"
             "    5. Exit"
         )
@@ -97,10 +153,12 @@ class ProjectManager:
         # Merge with defaults so missing keys don't silently break things
         self.template = {
             "files": {**DEFAULT_TEMPLATE["files"], **data.get("files", {})},
+            "folders": {**DEFAULT_TEMPLATE["folders"], **data.get("folders", {})},
             "init-git-repo": data.get("init-git-repo", False),
         }
 
         print("Current template settings:\n")
+        print(f"folders: {self.template['folders']}")
         print(f"files: {self.template['files']}")
         print(f"init-git-repo: {self.template['init-git-repo']}")
         print()
@@ -144,9 +202,18 @@ class ProjectManager:
 
         project_path.mkdir(parents=True)
 
+        for foldername, should_create in self.template.get("folders", {}).items():
+            if should_create:
+                (project_path / foldername).mkdir()
+
         for filename, should_create in self.template.get("files", {}).items():
             if should_create:
-                (project_path / filename).touch()
+                file_path = project_path / filename
+                default_content = DEFAULT_FILE_CONTENTS.get(filename)
+                if default_content is not None:
+                    file_path.write_text(default_content, encoding="utf-8")
+                else:
+                    file_path.touch()
 
         if self.template.get("init-git-repo"):
             self._init_git_repo(project_path)
@@ -201,15 +268,20 @@ class ProjectManager:
             print(f"No project named '{project_name}' found.\n")
             return
 
-        confirmation = input(
-            f"Are you sure you want to delete the project '{project_name}'? (y/n): "
-        ).strip().lower()
+        confirmation = (
+            input(
+                f"Are you sure you want to delete the project '{project_name}'? (y/n): "
+            )
+            .strip()
+            .lower()
+        )
 
         if confirmation == "y":
             shutil.rmtree(project_path)
             print(f"Project '{project_name}' has been deleted.\n")
         else:
             print("Deletion canceled.\n")
+
 
 def main():
     manager = ProjectManager()
