@@ -38,7 +38,7 @@ python main.py
 1. Create a new project - Create a new project from the template
 2. List existing projects - View all your projects
 3. Update a project - Modify an existing project (coming soon)
-4. Delete a project - Remove a project
+4. Delete a project - Remove a project (coming soon)
 5. Exit - Close the application
 ```
 
@@ -49,17 +49,20 @@ When you first run the application, a `project_template.json` file is created in
 
 ```json
 {
-  "readme": true,
+  "files": {
+    "README.md": true,
+    ".gitignore": false
+  },
   "init-git-repo": false
 }
 ```
 
-- `readme`: If `true`, a README.md file is created for each new project
-- `init-git-repo`: If `true`, a git repository is automatically initialized with an initial commit
+- `files`: A dictionary of filenames to create in each new project. Set any filename to `true` to have it created automatically (empty), or `false` to skip it. You can add your own entries here (e.g. `"LICENSE": true`) to have them created for every new project.
+- `init-git-repo`: If `true`, a git repository is automatically initialized with an initial commit. If `git` isn't installed or a git command fails, you'll get a warning instead of a silent failure.
 
 ### Creating a Project
 1. Select option `1` from the main menu
-2. Enter the project name
+2. Enter the project name (it can't be empty, have leading/trailing spaces, or contain invalid filesystem characters like `< > : " / \ | ? *`)
 3. The project will be created in the `Projects/` directory with the specified template settings
 
 ### Project Directory Structure
@@ -96,7 +99,10 @@ Edit `Projects/project_template.json` to customize default behavior for new proj
 
 ```json
 {
-  "readme": true,
+  "files": {
+    "README.md": true,
+    ".gitignore": true
+  },
   "init-git-repo": true
 }
 ```
@@ -130,6 +136,7 @@ python main.py
 ## Future Enhancements 🚀
 
 - [ ] Update project functionality
+- [ ] Delete project functionality
 - [ ] Project metadata (description, tags, status)
 - [ ] Task management within projects
 - [ ] Project statistics and analytics
