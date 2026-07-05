@@ -1,6 +1,6 @@
 [project]
 name = "just-manage-my-projects"
-version = "0.1.0"
+version = "0.1.7"
 description = "This is a simple cli project management tool that allows you to manage your projects and tasks in a simple and efficient way."
 readme = "README.md"
 requires-python = ">=3.13"
