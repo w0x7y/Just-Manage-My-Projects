@@ -185,6 +185,30 @@ DEFAULT_PROJECT_INDEX_HTML = r"""<!doctype html>
             margin-top: 0;
         }
 
+        .todo-columns {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .todo-column h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin: 0 0 0.75rem;
+            text-align: center;
+        }
+
+        .todo-extra {
+            margin-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            padding-top: 1rem;
+        }
+
+        @media (max-width: 640px) {
+            .todo-columns {
+                grid-template-columns: 1fr;
+            }
+        }
+
         ul.todo-list {
             list-style: none;
             margin: 0 0 0.5rem;
@@ -516,24 +540,32 @@ DEFAULT_PROJECT_INDEX_HTML = r"""<!doctype html>
             const order = [];
             let current = null;
 
-            markdown.split("\n").forEach((line) => {
-                const heading = line.match(/^#{1,3}\s+(.*)$/);
-                if (heading) {
-                    current = heading[1].trim();
-                    if (!sections[current]) {
-                        sections[current] = [];
-                        order.push(current);
+            // Normalize CRLF/CR line endings before splitting. Files written
+            // by Python's Path.write_text() on Windows end up as \r\n, and a
+            // leftover \r on each line breaks the regexes below entirely:
+            // "." never matches \r, and "$" (no /m flag) needs the true end
+            // of the string, so a match that should succeed silently fails.
+            markdown
+                .replace(/\r\n?/g, "\n")
+                .split("\n")
+                .forEach((line) => {
+                    const heading = line.match(/^#{1,3}\s+(.*)$/);
+                    if (heading) {
+                        current = heading[1].trim();
+                        if (!sections[current]) {
+                            sections[current] = [];
+                            order.push(current);
+                        }
+                        return;
                     }
-                    return;
-                }
-                const item = line.match(/^\s*-\s*\[( |x|X)\]\s*(.*)$/);
-                if (item && current) {
-                    sections[current].push({
-                        done: item[1].toLowerCase() === "x",
-                        text: item[2].trim(),
-                    });
-                }
-            });
+                    const item = line.match(/^\s*-\s*\[( |x|X)\]\s*(.*)$/);
+                    if (item && current) {
+                        sections[current].push({
+                            done: item[1].toLowerCase() === "x",
+                            text: item[2].trim(),
+                        });
+                    }
+                });
 
             return order.map((title) => ({
                 title,
@@ -541,27 +573,56 @@ DEFAULT_PROJECT_INDEX_HTML = r"""<!doctype html>
             }));
         }
 
+        // Renders High/Medium/Low priority sections as three side-by-side
+        // columns. Any other headings the file happens to contain (besides
+        // the top-level "TODO" title) are rendered below as a fallback so
+        // nothing is silently dropped. Read-only: no done-toggle behavior.
+        function renderTodoColumn(title, items) {
+            if (!items.length) {
+                return `<h3>${escapeHtml(title)}</h3><p class="dim">Nothing here.</p>`;
+            }
+            const list = items
+                .map(
+                    (i) =>
+                        `<li class="${i.done ? "done" : ""}"><span class="checkbox">${i.done ? "[x]" : "[ ]"
+                        }</span><span>${escapeHtml(i.text)}</span></li>`,
+                )
+                .join("");
+            return `<h3>${escapeHtml(title)}</h3><ul class="todo-list">${list}</ul>`;
+        }
+
         function renderTodo(markdown) {
             const sections = parseTodo(markdown).filter(
                 (s) => s.title.toLowerCase() !== "todo",
             );
-            if (!sections.length) return '<p class="dim">No TODO items yet.</p>';
 
-            return sections
-                .map(({ title, items }) => {
-                    if (!items.length) {
-                        return `<h3>${escapeHtml(title)}</h3><p class="dim">Nothing here.</p>`;
-                    }
-                    const list = items
-                        .map(
-                            (i) =>
-                                `<li class="${i.done ? "done" : ""}"><span class="checkbox">${i.done ? "\u2611" : "\u2610"
-                                }</span><span>${escapeHtml(i.text)}</span></li>`,
-                        )
-                        .join("");
-                    return `<h3>${escapeHtml(title)}</h3><ul class="todo-list">${list}</ul>`;
+            const priorityKeys = ["high priority", "medium priority", "low priority"];
+            const byKey = {};
+            sections.forEach((s) => {
+                byKey[s.title.toLowerCase()] = s;
+            });
+
+            const columnsHtml = priorityKeys
+                .map((key) => {
+                    const found = byKey[key];
+                    const title = found
+                        ? found.title
+                        : key.replace(/\b\w/g, (c) => c.toUpperCase());
+                    const items = found ? found.items : [];
+                    return `<div class="todo-column">${renderTodoColumn(title, items)}</div>`;
                 })
                 .join("");
+
+            const extraSections = sections.filter(
+                (s) => !priorityKeys.includes(s.title.toLowerCase()),
+            );
+            const extraHtml = extraSections.length
+                ? `<div class="todo-extra">${extraSections
+                    .map((s) => renderTodoColumn(s.title, s.items))
+                    .join("")}</div>`
+                : "";
+
+            return `<div class="todo-columns">${columnsHtml}</div>${extraHtml}`;
         }
 
         function renderIssues(data) {
