@@ -6,10 +6,11 @@ A simple and efficient CLI-based project management tool that allows you to crea
 
 - **Create New Projects** - Quickly scaffold new projects with customizable templates
 - **List Projects** - View all your existing projects at a glance
-- **Update Projects** - Modify project settings and configurations
+- **Update Projects** - Upgrade the project to a new version if available on github (if a GitHub repository is associated with the project)
 - **Delete Projects** - Remove projects you no longer need
-- **Project Templates** - Define default settings for all new projects (README generation, git initialization)
+- **Project Templates** - Define default settings for all new projects (README generation, git initialization, TODO list, etc.)
 - **Git Integration** - Optionally initialize git repositories for your projects automatically
+- **Web-based Interface** - Manage your projects through a simple web interface (WIP)
 
 ## Requirements 📦
 
@@ -31,17 +32,6 @@ Start the application:
 python main.py
 ```
 
-### Menu Options
-
-```
-0. Reload project template - Reload or create the default project template
-1. Create a new project - Create a new project from the template
-2. List existing projects - View all your projects
-3. Update a project - Modify an existing project (coming soon)
-4. Delete a project - Remove a project (coming soon)
-5. Exit - Close the application
-```
-
 ## How It Works 🔧
 
 ### Project Template
@@ -49,16 +39,21 @@ When you first run the application, a `project_template.json` file is created in
 
 ```json
 {
-  "files": {
-    "README.md": true,
-    ".gitignore": false
-  },
-  "init-git-repo": false
+    "folders": {
+        "src": True,  # src is a folder for source code
+    },
+    "files": {
+        "index.html": True,  # index.html is a file for the webUI manager
+        "Notes.md": False,  # Notes.md is a file for taking free-form notes
+        "Project.json": True,  # Project.json is a file for storing project metadata
+        "Issues.json": True,  # Issues.json is a file for tracking issues
+        "TODO.md": True,  # TODO.md is a file for tracking tasks
+        "README.md": True,  # README.md is a file for project documentation
+        ".gitignore": False,
+    },
+    "init-git-repo": False,
 }
 ```
-
-- `files`: A dictionary of filenames to create in each new project. Set any filename to `true` to have it created automatically (empty), or `false` to skip it. You can add your own entries here (e.g. `"LICENSE": true`) to have them created for every new project.
-- `init-git-repo`: If `true`, a git repository is automatically initialized with an initial commit. If `git` isn't installed or a git command fails, you'll get a warning instead of a silent failure.
 
 ### Creating a Project
 1. Select option `1` from the main menu
@@ -68,12 +63,13 @@ When you first run the application, a `project_template.json` file is created in
 ### Project Directory Structure
 ```
 Projects/
+├── style.css
+├── WebUI.html
 ├── project_template.json
 ├── Your Project 1/
-│   └── README.md
+│   └── Your Project 1 Files...
 ├── Your Project 2/
-│   ├── README.md
-│   └── .git/
+│   └── Your Project 2 Files...
 └── ...
 ```
 
@@ -89,8 +85,6 @@ Projects/
 ├── .python-version        # Python version specification
 ├── .venv/                 # Virtual environment (local)
 └── Projects/              # Directory containing all your projects
-    ├── project_template.json
-    └── [your projects here]
 ```
 
 ## Configuration 🔨
@@ -99,11 +93,19 @@ Edit `Projects/project_template.json` to customize default behavior for new proj
 
 ```json
 {
-  "files": {
-    "README.md": true,
-    ".gitignore": true
-  },
-  "init-git-repo": true
+    "folders": {
+        "src": True,  # src is a folder for source code
+    },
+    "files": {
+        "index.html": True,  # index.html is a file for the webUI manager
+        "Notes.md": False,  # Notes.md is a file for taking free-form notes
+        "Project.json": True,  # Project.json is a file for storing project metadata
+        "Issues.json": True,  # Issues.json is a file for tracking issues
+        "TODO.md": True,  # TODO.md is a file for tracking tasks
+        "README.md": True,  # README.md is a file for project documentation
+        ".gitignore": False,
+    },
+    "init-git-repo": False,
 }
 ```
 
@@ -116,6 +118,9 @@ This project uses:
 - **pathlib** - Cross-platform file handling
 - **json** - Configuration management
 - **subprocess** - Git integration
+- **re** - Input validation
+- **shutil** - File and directory operations
+- **uv** - Dependency management
 
 ### Running from Source
 
@@ -136,8 +141,9 @@ python main.py
 ## Future 🚀
 
 - [ ] Auto getting the project information from GitHub (if a GitHub repository is associated with the project)
-- [ ] Fixing the TODO list fetching from the file to the Web-based interface
-- [x] Web-based interface
+- [ ] Make the CLI part more have more functionality (So the user can just use the CLI without needing to use the Web-based interface or other editors)
+- [x] Fixing the TODO list fetching from the file to the Web-based interface
+- [ ] Make the Web-based interface more interactive and user-friendly
 - [ ] Auto GitHub integration for project updates (fetching newer versions, issues and more)
 - [ ] Export project information
 
