@@ -73,7 +73,7 @@ Projects/
 └── ...
 ```
 
-## Project Structure 📁
+## Projects Structure 📁
 
 ```
 .
