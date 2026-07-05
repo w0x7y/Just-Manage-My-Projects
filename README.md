@@ -9,6 +9,7 @@ A simple and efficient CLI-based project management tool that allows you to crea
 - **Update Projects** - Upgrade the project to a new version if available on github (if a GitHub repository is associated with the project)
 - **Delete Projects** - Remove projects you no longer need
 - **Project Templates** - Define default settings for all new projects (README generation, git initialization, TODO list, etc.)
+- **Viewing/Editing Project Files** - Open and edit project files directly from the CLI (With your preferred text editor)
 - **Git Integration** - Optionally initialize git repositories for your projects automatically
 - **Web-based Interface** - Manage your projects through a simple web interface (WIP)
 
@@ -141,8 +142,7 @@ python main.py
 ## Future 🚀
 
 - [ ] Auto getting the project information from GitHub (if a GitHub repository is associated with the project)
-- [ ] Make the CLI part more have more functionality (So the user can just use the CLI without needing to use the Web-based interface or other editors)
-- [x] Fixing the TODO list fetching from the file to the Web-based interface
+- [ ] Make the CLI part have more functionality (So the user can just use the CLI without needing to use the Web-based interface or other editors)
 - [ ] Make the Web-based interface more interactive and user-friendly
 - [ ] Auto GitHub integration for project updates (fetching newer versions, issues and more)
 - [ ] Export project information
