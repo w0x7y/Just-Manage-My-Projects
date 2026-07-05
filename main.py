@@ -1,3 +1,4 @@
+from calendar import c
 import json
 import re
 import shutil
@@ -6,6 +7,8 @@ from pathlib import Path
 
 # Characters that are invalid in folder names on Windows/macOS/Linux
 INVALID_NAME_CHARS = set('<>:"/\\|?*')
+
+EDITOR = "nvim"  # Change this to your preferred editor command (e.g., "code", "nano", "vim", etc.)
 
 DEFAULT_TODO_TEMPLATE = """# TODO
 
@@ -942,9 +945,11 @@ class ProjectManager:
             "    2. List existing projects\n"
             "    3. Update a project (If a remote Git repo is present)\n"
             "    4. Delete a project\n"
-            "    5. Exit"
+            "    5. View/Edit projects\n"
+            "    6. Change default editor (current: {})\n".format(EDITOR) +
+            "    7. Exit"
         )
-        return input("Enter your choice (0-5): ").strip()
+        return input("Enter your choice (0-7): ").strip()
 
     def handle_choice(self, choice: str) -> bool:
         """Returns False when the program should exit."""
@@ -954,10 +959,12 @@ class ProjectManager:
             "2": self.list_existing_projects,
             "3": self.update_project,
             "4": self.delete_project,
+            "5": self.view_projects,
+            "6": self.change_default_editor,
         }
 
-        if choice == "5":
-            print("Exiting the program. Goodbye!")
+        if choice == "7":
+            print("Exiting. Goodbye!")
             return False
 
         action = actions.get(choice)
@@ -1186,6 +1193,47 @@ class ProjectManager:
         else:
             print("Deletion canceled.\n")
 
+    def change_default_editor(self):
+        global EDITOR
+        new_editor = input(
+            f"Enter the command for your preferred text editor (current: {EDITOR}): "
+        ).strip()
+        if new_editor:
+            EDITOR = new_editor
+            print(f"Default editor changed to: {EDITOR}\n")
+        else:
+            print("No changes made to the default editor.\n")
+
+    def view_projects(self):
+        project_name = input("Choose a project by entering the name: ")
+        project_path = self.projects_dir / project_name
+
+        if not project_path.exists() or not project_path.is_dir():
+            print(f"No project named '{project_name}' found.\n")
+            return
+
+        for item in project_path.iterdir():
+            if item.is_dir():
+                print(f"Folder: {item.name}")
+
+        for item in project_path.iterdir():
+            if item.is_file():
+                print(f"File: {item.name}")
+
+        file_to_open = input("Enter the name of the file you want to open (or press Enter to skip): ").strip()
+        if file_to_open:
+            file_path = project_path / file_to_open
+            if file_path.exists() and file_path.is_file():
+                print(f"Opening file: {file_to_open}")
+                try:
+                    subprocess.run([EDITOR, str(file_path)], check=True)
+                    print(f"Successfully edited {file_path}")
+                except FileNotFoundError:
+                    print(f"Error: '{EDITOR}' is not installed or not in your system's PATH.")
+                except subprocess.CalledProcessError:
+                    print(f"{EDITOR} closed with an error code.")
+            else:
+                print(f"File not found: {file_to_open}\n canceling operation.\n")
 
 def main():
     manager = ProjectManager()
